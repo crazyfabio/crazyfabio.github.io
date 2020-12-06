@@ -1,0 +1,310 @@
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  height: 100%;
+  width: 100%;
+}
+body {
+  margin: 0;
+  font: 0 / 1 'Roboto', sans-serif;
+  background-color: #303030;
+}
+.material-btn {
+  border: none;
+  background: none;
+  text-transform: uppercase;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 11px 16px;
+  text-decoration: none;
+}
+.material-btn.coloured {
+  color: #00BCD4;
+}
+.material-btn.raised {
+  background-color: #00BCD4;
+  color: white;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+}
+.material-btn:focus {
+  outline: none;
+}
+.material-btn.icon {
+  width: 48px;
+  height: 48px;
+  background-size: 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 0;
+}
+.material-btn:disabled {
+  cursor: default;
+  color: rgba(255,255,255,0.3);
+}
+
+#list {
+  display: none;
+  /* margin: 20px;
+  background-color: #424242;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+  border-radius: 2px;
+  overflow: hidden; */
+}
+body.list-view #list {
+  display: block;
+}
+.controls {
+  height: 64px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  position: relative;
+  transition: background-color .2s;
+}
+body.selection .controls {
+  background-color: #006064;
+}
+.controls .material-btn {
+  margin: 14px 8px;
+}
+#new {
+  transition: opacity .2s;
+}
+body.selection #new {
+  pointer-events: none;
+  opacity: 0;
+}
+#selection {
+  position: absolute;
+  top: -64px;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  transition: top .2s, opacity .2s;
+}
+body.selection #selection {
+  top: 0;
+  opacity: 1;
+}
+#selectcount {
+  color: #00BCD4;
+  font-size: 14px;
+  margin: 25px 24px;
+  display: inline-block;
+}
+#remove {
+  background-image: url("material_delete.svg");
+  position: absolute;
+  right: 0;
+  margin: 8px;
+  transition: right .2s;
+}
+#list > a {
+  display: flex;
+  text-decoration: none;
+  height: 48px;
+}
+#list > a.heading {
+  height: 56px;
+}
+#list > a:not(.heading):hover, #list > a:not(.heading):focus {
+  outline: none;
+  background-color: #424242;
+}
+#list > a.selected {
+  background-color: #393939;
+}
+#list > a > span {
+  display: inline-block;
+  font-size: 14px;
+  padding: 17px 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+  padding-left: 0;
+  white-space: pre;
+}
+#list > a.heading > span {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  padding-top: 22px;
+  padding-bottom: 22px;
+}
+#list > a > button {
+  margin: 0 9px;
+  background-image: url("material_checkbox.svg"), url("material_uncheckbox.svg");
+  background-size: 0, 24px;
+  opacity: 0.7;
+}
+#list > a.selected > button, #list > a > button.checked {
+  background-size: 24px, 24px;
+  opacity: 1;
+  transition: background-size .2s; /* intentional */
+}
+#list > a.selected > button > div.ripple, #list > a > button.checked > div.ripple {
+  background-color: rgba(0, 188, 212, 0.3);
+}
+#list > a > button:focus {
+  outline: none;
+}
+#list > a.heading > button {
+  margin: 4px 9px;
+}
+#list > a > span:first-of-type {
+  flex: 3 0 0;
+}
+#list > a > span:last-of-type {
+  flex: 7 0 0;
+}
+#list > a:not(.heading) > span:last-of-type {
+  font-family: "Inconsolata", monospace;
+}
+
+body.list-view #editor {
+  display: none;
+}
+#editor .navbar {
+  background-color: #212121;
+  height: 56px;
+  position: relative;
+}
+#editor .navbar a {
+  background-image: url("material_back.svg");
+  display: inline-block;
+  margin: 4px;
+}
+#editor .navbar span {
+  font-size: 20px;
+  font-weight: 500;
+  color: white;
+  display: inline-block;
+  position: absolute;
+  left: 72px;
+  bottom: 18px;
+}
+#editor .container {
+  max-width: 1000px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 0 20px;
+}
+.input-wrapper {
+  height: 60px;
+  width: 234px;
+  position: relative;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.7);
+  transition: box-shadow .2s;
+}
+.input-wrapper:hover {
+  box-shadow: 0 2px 0 white;
+}
+.input-wrapper.focus {
+  box-shadow: 0 2px 0 #00BCD4;
+}
+.input-wrapper input {
+  width: 100%;
+  height: 32px;
+  font-size: 16px;
+  border: none;
+  background: none;
+  bottom: 0;
+  color: white;
+  left: 0;
+  position: absolute;
+  padding: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+.input-wrapper input:focus {
+  outline: none;
+  cursor: auto;
+}
+.input-wrapper label, .textarea-wrapper label {
+  font-size: 16px;
+  color: rgba(255,255,255,0.7);
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  transition: font-size .2s, bottom .2s, color .2s;
+}
+.input-wrapper.filled label, .input-wrapper.focus label {
+  font-size: 12px;
+  bottom: 32px;
+}
+.input-wrapper.focus label, .textarea-wrapper.focus label {
+  color: #00BCD4;
+}
+.textarea-wrapper {
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.7);
+  position: relative;
+  transition: box-shadow .2s;
+  margin: 40px 0;
+}
+.textarea-wrapper:hover {
+  box-shadow: 0 0 0 2px white;
+}
+.textarea-wrapper.focus {
+  box-shadow: 0 0 0 2px #00BCD4;
+}
+.textarea-wrapper textarea {
+  width: 100%;
+  border: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+  background: none;
+  resize: none;
+  box-sizing: border-box;
+  padding: 20px 16px;
+  padding-top: 32px;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  min-height: 100px;
+}
+.textarea-wrapper textarea:focus {
+  outline: none;
+  cursor: auto;
+}
+.textarea-wrapper label {
+  top: 20px;
+  bottom: auto;
+  left: 16px;
+  transition: all .2s;
+}
+.textarea-wrapper.focus label, .textarea-wrapper.filled label {
+  font-size: 12px;
+  top: 8px;
+}
+#value textarea {
+  font-family: "Inconsolata", monospace;
+}
+body.json-editor-mode #value {
+  display: none;
+}
+#jsoneditor {
+  display: none;
+}
+body.json-editor-mode #jsoneditor {
+  display: block;
+}
+#jsoneditor .editor {
+  padding: 20px 16px;
+  padding-top: 32px;
+  font-size: 12px;
+}
+#usejson {
+  margin-left: 16px;
+  margin-bottom: 40px;
+}
+.text-width {
+  white-space: pre;
+  display: inline;
+  position: fixed;
+}
+.text-width::after {
+  content: "\a";
+}

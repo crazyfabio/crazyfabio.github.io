@@ -1,0 +1,372 @@
+/* https://fonts.google.com/?selection.family=PT+Serif:ital,wght@0,400;0,700;1,400|Raleway:ital,wght@0,300;1,300|Roboto+Slab:wght@400;700&sidebar.open */
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Raleway:ital,wght@0,300;1,300&family=Roboto+Slab:wght@400;700&display=swap');
+
+html,
+body {
+  height: 100%;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+
+  display: flex;
+  flex-direction: column;
+  font-family: cursive; /* Catch missing font-family declarations lol */
+  color: red;
+}
+
+button,
+input,
+select,
+textarea {
+  -webkit-appearance: none;
+  border: none;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+button:not(:disabled):hover {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Roboto Slab', serif;
+  margin: 0;
+}
+h3 {
+  font-weight: normal;
+}
+
+::selection {
+  background-color: rgba(255, 255, 0, 0.5);
+}
+
+.centre-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.pixelated {
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+.cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.5), transparent), url('./cover.png');
+  background-size: cover;
+  background-position: center;
+  flex-direction: column;
+  z-index: 1;
+  color: white;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+}
+.title-wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  --black: black;
+}
+.title,
+.author {
+  margin: 0;
+  background-color: var(--black);
+  color: white;
+  font-weight: 300;
+  font-family: 'Raleway', sans-serif;
+}
+.title {
+  font-size: 60px;
+}
+.author {
+  margin-top: 20px;
+  text-transform: uppercase;
+  font-size: 24px;
+  padding: 0 30px;
+}
+.scroll-down {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0;
+  display: block;
+  width: 50px;
+  height: 50px;
+  margin: 20px auto;
+  background-image: url('./down.svg');
+  background-position: 50%;
+  background-size: contain;
+  animation: scroll-down-please 1.5s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+}
+@keyframes scroll-down-please {
+  0% {
+    background-position-y: 0;
+  }
+  80% {
+    background-position-y: 50px;
+  }
+  100% {
+    background-position-y: 50px;
+  }
+}
+
+.shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Colours from https://dribbble.com/shots/3666980-Sepia-theme */
+.content-wrapper {
+  display: flex;
+  position: relative;
+  z-index: 2;
+  margin-top: 100vh;
+  background-color: #E6DDCE;
+  color: #59564E;
+  align-items: flex-start;
+}
+
+.table-of-contents {
+  position: sticky;
+  top: 0;
+  color: rgba(0, 0, 0, 0.8);
+  z-index: 1;
+  max-width: 300px;
+  padding: 20px 0;
+}
+.contents-heading {
+  font-size: 24px;
+  margin: 0 20px;
+  margin-bottom: 5px;
+}
+.contents-main {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.piece-link {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10px 20px;
+  transition: background-color .2s;
+}
+.piece-link:not(.selected):hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.piece-link.selected {
+  background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.05));
+  cursor: default;
+}
+.link-title {
+  font-family: 'Roboto Slab', serif;
+}
+.link-type {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 5px;
+}
+
+.content {
+  flex: auto;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+  font-family: 'PT Serif', serif;
+}
+.piece {
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 20px 0;
+}
+.piece hgroup {
+  margin-bottom: 20px;
+}
+.piece-title {
+  font-size: 48px;
+}
+.piece-type {
+  font-size: 24px;
+}
+.separator {
+  height: 100vh;
+  background-image: url('./sheep.png');
+  background-size: 150px;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.1;
+}
+.return-to-toc:not(:focus) {
+  color: transparent;
+  font-size: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+@media (max-width: 600px) {
+  html {
+    scroll-padding-top: 120px;
+  }
+  .content-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .table-of-contents {
+    background-color: #E6DDCE;
+    white-space: nowrap;
+    max-width: none;
+    padding-bottom: 0;
+    padding-top: 15px;
+  }
+  .table-of-contents::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+  }
+  .contents-main {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 0 10px;
+  }
+  .contents-main li {
+    flex: 1 0 0;
+  }
+  .piece-link {
+    padding: 5px 10px;
+  }
+  .piece-link.selected {
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.05));
+  }
+  .link-title {
+    max-width: 50vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .content {
+    box-shadow: none;
+  }
+}
+
+.piece p {
+  margin: 0;
+  text-indent: 0.5in;
+  line-height: 1.8;
+}
+.piece .no-indent {
+  text-indent: 0;
+}
+.piece .space-before {
+  margin-top: 20px;
+}
+.piece .space-after {
+  margin-bottom: 20px;
+}
+.piece .space-around {
+  margin: 20px 0;
+}
+.piece .letter-date {
+  text-align: right;
+}
+.piece .small-caps {
+  font-weight: normal;
+  font-size: 0.8em;
+  text-transform: uppercase;
+}
+.piece h3 {
+  margin: 15px 0;
+}
+.piece .independent-times-subtitle {
+  font-weight: normal;
+  font-size: 0.8em;
+}
+.piece .snippet-divider {
+  border: none;
+  margin-top: 40px;
+}
+.piece li {
+  margin: 15px 0;
+}
+.piece .emoji-title {
+  font-size: 2em;
+  color: black;
+}
+
+.expert-link {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  height: 100vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('./thirty-eight.png');
+  background-size: cover;
+  background-position: center;
+  font-family: 'Roboto Slab', serif;
+  flex-direction: column;
+  color: white;
+}
+.expert-desc {
+  max-width: 500px;
+  padding: 10px 20px;
+  font-size: 24px;
+}
+.expert-play-btn {
+  border: 1px solid white;
+  background-color: rgba(0, 0, 0, 0.2);
+  font-size: 20px;
+  padding: 10px 20px;
+  background-image: url('./go.svg');
+  background-position: 150% 50%;
+  background-size: 20px;
+  background-repeat: no-repeat;
+  transition: all .2s;
+}
+.expert-play-btn:hover {
+  background-position-x: calc(100% - 15px);
+  padding-right: 50px;
+  background-color: black;
+}
+.expert-play-btn:active {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+:disabled {
+  opacity: 0.5;
+}

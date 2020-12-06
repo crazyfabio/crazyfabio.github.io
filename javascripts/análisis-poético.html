@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Análisis poético</title>
+    <meta name="description" content="Analisar poemas en español" />
+
+    <link rel="stylesheet" type="text/css" href="/sheep3.css">
+    <script src="/sheep3.js" charset="utf-8"></script>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
+          Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+        display: flex;
+        margin: 0;
+        white-space: pre-wrap;
+        background-color: #1b1821;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      textarea {
+        -webkit-appearance: none;
+        border: none;
+        background: none;
+        font: inherit;
+        color: inherit;
+      }
+
+      .poema,
+      .resultado {
+        flex: 1 0 0;
+        padding: 40px;
+      }
+      .poema {
+        resize: none;
+      }
+
+      .análisis-verso {
+        color: rgba(255, 255, 255, 0.3);
+      }
+      .análisis-sílabas {
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.8em;
+      }
+      .análisis-sinalefa,
+      .análisis-hiato,
+      .análisis-diéresis,
+      .análisis-sinéresis {
+        font-weight: bold;
+        font-size: 0.6em;
+        text-transform: uppercase;
+        padding: 0 2px;
+        border-radius: 2px;
+        color: rgba(0, 0, 0, 0.8);
+        background-color: white;
+      }
+      .análisis-sinalefa {
+        background-color: #f1d677;
+      }
+      .análisis-hiato {
+        background-color: #f19177;
+      }
+      .análisis-diéresis {
+        background-color: #99d29a;
+      }
+      .análisis-sinéresis {
+        background-color: #dca9f3;
+      }
+      .análisis-sílaba,
+      .análisis-sílaba-con-sinéresis {
+        border-bottom: 1px solid #452c50;
+      }
+      .análisis-sílaba-con-sinéresis {
+        border-bottom-color: #dca9f3;
+      }
+      .análisis-datos-de-estrofa {
+        font-size: 0.8em;
+        color: rgba(255, 255, 255, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- https://scalar.usc.edu/works/literalia/mir-los-muros-de-la-patria-ma-1648 -->
+    <textarea class="poema" id="poema" placeholder="Poner el poema aquí" autofocus>Miré los muros de la patria mía,
+si un tiempo fuertes ya desmoronados,
+de la carrera de la edad cansados,
+por quien caduca ya su valentía.
+
+Salime al campo. Vi que el sol bebía
+los arroyos del hielo desatados,
+y del monte quejosos los ganados
+que con sombras hurtó su luz al día.
+
+Entré en mi casa. Vi que, amancillada,
+de anciana habitación era despojos;
+mi báculo, más corvo y menos fuerte.
+
+Vencida de la edad sentí mi espada,
+y no hallé cosa en que poner los ojos
+que no fuese recuerdo de la muerte.</textarea>
+    <div class="resultado" id="resultado"></div>
+    <script type="module">
+      class Palabra {
+        #sílabas = null
+        #partes = null
+
+        constructor (texto, siguiente = '') {
+          this.palabra = texto
+          this.siguiente = siguiente
+        }
+
+        #generarSílabas () {
+          if (!this.#sílabas) {
+            this.#partes = []
+            this.#sílabas = []
+            let encuentro
+            let índiceAnterior = 0
+            while ((encuentro = Palabra.#obtenerSílabas.exec(this.palabra))) {
+              const [vocales] = encuentro
+              const consonantes = this.palabra.slice(índiceAnterior, encuentro.index)
+              índiceAnterior = encuentro.index + vocales.length
+              this.#partes.push([consonantes, vocales])
+              this.#sílabas.push(vocales)
+            }
+            this.#partes.push([this.palabra.slice(índiceAnterior), ''])
+          }
+          return this.#sílabas
+        }
+
+        // 1 => aguda
+        // 2 => llana/grave
+        // 3 => esdrújula
+        // 4 => sobreesdrújula
+        get acentuación () {
+          const sílabas = this.#generarSílabas()
+          if (sílabas.length <= 1) return 1
+          const índice = sílabas.findIndex(sílaba => Palabra.#esTiltado.test(sílaba))
+          let acentuación
+          if (índice !== -1) {
+            acentuación = sílabas.length - índice
+          } else {
+            acentuación = Palabra.#noTerminaConVocalONS.test(this.palabra) ? 1 : 2
+            if (this.palabra.toLowerCase().endsWith('mente')) {
+              acentuación += 2
+            }
+          }
+          return acentuación
+        }
+
+        get sílabas () {
+          // "maestra" y "caía" tienen tres sílabas y son llanas
+          // La regex no encuentra palabras como "y" así que hay un mínimo de
+          // una sílaba.
+          return Math.max(this.#generarSílabas().length || 1)
+        }
+
+        get empiezaConVocal () {
+          return Palabra.#empiezaConVocal.test(this.palabra)
+        }
+
+        get terminaConVocal () {
+          return Palabra.#terminaConVocal.test(this.palabra)
+        }
+
+        #hayVocalesEntre (próxima) {
+          return this.terminaConVocal && próxima.empiezaConVocal
+        }
+
+        haySinalefaCon (próxima) {
+          // ¿Hay una sinalefa entre...
+          // - "que" y "huele"? (actualmente no)
+          // - "de" y "él"? (actualmente sí)
+          return (this.sílabas === 1 || this.acentuación !== 1) &&
+            (próxima.sílabas === 1 || próxima.acentuación !== próxima.sílabas) &&
+            this.#hayVocalesEntre(próxima)
+        }
+
+        hayHiatoCon (próxima) {
+          return this.#hayVocalesEntre(próxima) && !this.haySinalefaCon(próxima)
+        }
+
+        #haySinéresis ([consonantes, vocales]) {
+          return vocales[0] === 'u' &&
+            'gq'.includes(consonantes[consonantes.length - 1]?.toLowerCase()) &&
+            'ieíé'.includes(vocales[1]?.toLowerCase())
+            // qUIEre, averigUAr y pengÜIno pero no qUErer
+            ? vocales.length > 2
+            : vocales.length > 1
+        }
+
+        analisar (próxima) {
+          this.#generarSílabas()
+
+          const partes = []
+          if (this.#partes.length > 1) {
+            let primero = true
+            for (let i = 0; i < this.#partes.length; i++) {
+              const [consonantes, vocales] = this.#partes[i]
+              const sinéresis = this.#haySinéresis([consonantes, vocales])
+              // Para considerar: La frase "aho bahuevo" (no son palabras
+              // reales) tiene cinco sílabas en total pero hay una sinéresis en
+              // "aho". No sé si es importante. ¡Ya veremos!
+              // actualmente si es verdad: Aho
+              const sinéresisConHPróxima = !sinéresis &&
+                this.#partes[i + 1]?.[0].toLowerCase() === 'h' &&
+                !this.#haySinéresis(this.#partes[i + 1])
+              // actualmente si es verdad: ahO
+              const sinéresisConHAnterior = i > 0 && !sinéresis &&
+                consonantes.toLowerCase() === 'h' &&
+                !this.#haySinéresis(this.#partes[i - 1])
+              partes.push(
+                consonantes || vocales && !primero &&
+                  { texto: 'diéresis', tipo: 'diéresis' },
+                {
+                  texto: vocales,
+                  tipo: sinéresis || sinéresisConHPróxima || sinéresisConHAnterior
+                    ? 'sílaba-con-sinéresis'
+                    : 'sílaba'
+                }
+              )
+              if (sinéresis || sinéresisConHAnterior) {
+                partes.push({ texto: 'sinéresis', tipo: 'sinéresis' })
+              }
+              if (primero) primero = false
+            }
+          } else {
+            // Palabras como "y" sin "vocales" (AEIOU)
+            partes.push({ texto: this.palabra, tipo: 'sílaba' })
+          }
+
+          const interpalabras = []
+          if (próxima && this.haySinalefaCon(próxima)) {
+            interpalabras.push(' ', { texto: 'sinalefa', tipo: 'sinalefa' })
+          }
+          if (próxima && this.hayHiatoCon(próxima)) {
+            interpalabras.push(' ', { texto: 'hiato', tipo: 'hiato' })
+          }
+
+          return [
+            ...partes,
+            ...interpalabras,
+            this.siguiente
+          ]
+        }
+
+        toString () {
+          return this.palabra + this.siguiente
+        }
+
+        static obtenerPalabra = /[a-záéíóúüñ]+/gi
+
+        // Casos:
+        // mA.Estra
+        // cA.Í.A
+        // qUIEre
+        // gUArdar
+        // pengÜIno
+        // qUIUbo
+        // Solo es importante que el número de encuentros = el de sílabas. Por
+        // eso, no es importante encontrar las y.
+        static #obtenerSílabas = /(?:u|u?i)?[aeoáéó]|[uü]?[ií]u?|[uú]/gi
+
+        static #noTerminaConVocalONS = /[^aeiouáéíóúns](?:mente)?$/i
+
+        static #esTiltado = /[áéíóú]/i
+
+        // Excepción: la palabra "y"
+        // PREGUNTA: ¿Qué ocurriría si hay "lobo y agua"? ¿Hay una sinalefa
+        // GRANDE?
+        static #empiezaConVocal = /^h?[aeiouáéíóú]|^y$/i
+        static #terminaConVocal = /^y$|[aeiouáéíóú]$/i
+      }
+
+      class Verso extends Array {
+        prefacio = ''
+
+        get sílabas () {
+          let sílabas = 0
+          for (let i = 0; i < this.length; i++) {
+            const palabra = this[i]
+            const próximaPalabra = this[i + 1]
+            sílabas += palabra.sílabas
+            if (próximaPalabra && palabra.haySinalefaCon(próximaPalabra)) {
+              // Las sílabas combinan
+              sílabas--
+            }
+          }
+          return sílabas
+        }
+
+        analisar (contador) {
+          const número = ++contador.cuenta
+          return [
+            { texto: `${número}. `, tipo: 'verso' },
+            this.prefacio,
+            ...this.map((palabra, i) => palabra.analisar(this[i + 1])),
+            { texto: ` (${this.sílabas})`, tipo: 'sílabas' },
+            '\n'
+          ]
+        }
+
+        toString () {
+          return this.join('')
+        }
+
+        static nuevo (textoDeVerso) {
+          const palabras = new Verso()
+          let encuentro
+          let índiceAnterior = 0
+          while ((encuentro = Palabra.obtenerPalabra.exec(textoDeVerso))) {
+            const [palabra] = encuentro
+
+            if (palabras.length > 0) {
+              palabras[palabras.length - 1].siguiente = textoDeVerso.slice(índiceAnterior, encuentro.index)
+            } else {
+              palabras.prefacio = textoDeVerso.slice(0, encuentro.index)
+            }
+            índiceAnterior = encuentro.index + palabra.length
+
+            palabras.push(new Palabra(palabra))
+          }
+          if (palabras.length > 0) {
+            palabras[palabras.length - 1].siguiente = textoDeVerso.slice(índiceAnterior)
+          } else {
+            palabras.prefacio = textoDeVerso
+          }
+          return palabras
+        }
+
+        static tiposDeSílabas = {
+          2: 'bisílabo',
+          3: 'trisílabo',
+          4: 'tetrasílabo',
+          5: 'pentasílabo',
+          6: 'hexasílabo',
+          7: 'heptasílabo',
+          8: 'octosílabo',
+          9: 'eneasílabo',
+          10: 'decasílabo',
+          11: 'endecasílabo',
+          12: 'dodecasílabo',
+          14: 'alejandrino'
+        }
+      }
+
+      class Estrofa extends Array {
+        get sílabas () {
+          return Math.round(this.reduce((acumulado, verso) => acumulado + verso.sílabas, 0) / this.length)
+        }
+
+        analisar (contador) {
+          const { sílabas } = this
+          return [
+            { texto: `${sílabas} sílabas (${
+              Verso.tiposDeSílabas[sílabas]
+                ? `${Verso.tiposDeSílabas[sílabas]}; `
+                : ''
+            }arte ${sílabas > 8 ? 'mayor' : 'menor'}) · ${this.length} versos`, tipo: 'datos-de-estrofa' },
+            '\n',
+            ...this.map(verso => verso.analisar(contador)),
+            '\n'
+          ]
+        }
+
+        toString () {
+          return this.join('\n')
+        }
+
+        static nuevo (textoDeEstrofa) {
+          return Estrofa.from(
+            textoDeEstrofa.split(/\r?\n/),
+            Verso.nuevo
+          )
+        }
+      }
+
+      class Poema extends Array {
+        analisar () {
+          const fragmento = document.createDocumentFragment()
+          const contador = { cuenta: 0 }
+          const partes = this.map(estrofa => estrofa.analisar(contador)).flat(3)
+          let textoAnterior = null
+          for (const parte of partes) {
+            if (!parte) continue
+            if (parte.tipo) {
+              if (parte.texto) {
+                const span = document.createElement('span')
+                span.className = 'análisis-' + parte.tipo
+                span.textContent = parte.texto
+                fragmento.append(span)
+                textoAnterior = null
+              }
+            } else if (textoAnterior) {
+              textoAnterior.nodeValue += parte
+            } else {
+              const nodoDeTexto = document.createTextNode(parte)
+              textoAnterior = nodoDeTexto
+              fragmento.append(nodoDeTexto)
+            }
+          }
+          return fragmento
+        }
+
+        toString () {
+          return this.join('\n\n')
+        }
+
+        static nuevo (textoDePoema) {
+          return Poema.from(
+            textoDePoema
+              .normalize()
+              .trim()
+              .split(/(?:\r?\n){2,}/)
+              // Eliminar estrofas vacías
+              .filter(estrofa => estrofa),
+            Estrofa.nuevo
+          )
+        }
+      }
+
+      function pintar (poema, salida) {
+        while (salida.firstChild) salida.removeChild(salida.firstChild)
+        salida.append(poema.analisar())
+        console.log(poema)
+      }
+
+      function principio () {
+        const entrada = document.getElementById('poema')
+        const salida = document.getElementById('resultado')
+
+        entrada.addEventListener('input', e => {
+          pintar(Poema.nuevo(entrada.value), salida)
+        })
+        pintar(Poema.nuevo(entrada.value), salida)
+      }
+      principio()
+
+
+      Object.assign(window, { Palabra, poema })
+    </script>
+  </body>
+</html>

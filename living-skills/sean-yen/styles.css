@@ -1,0 +1,287 @@
+body {
+  margin: 0 auto;
+  padding: 20px;
+  max-width: 600px;
+  font-size: 0;
+  background-color: #221c26;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+  margin-bottom: 100px;
+}
+
+.glow {
+  text-shadow: 0 0 0.15em currentColor;
+  font-family: 'Audiowide', monospace;
+}
+h2, h1 {
+  color: #7dbffd;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+  font-weight: normal;
+}
+h2::after {
+  content: '';
+  flex: auto;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 1px;
+  margin-left: 1ch;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+}
+h1 {
+  color: #fd8e02;
+  font-size: 48px;
+  display: block;
+}
+.content {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: left;
+  line-height: 1.5;
+}
+.higher-contrast .content, .higher-contrast .caption {
+  color: white;
+}
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+img {
+  max-width: 100%;
+  max-height: 50vh;
+  border-radius: 10px;
+}
+.higher-contrast {
+  max-height: 80vh;
+}
+.caption {
+  display: block;
+  max-width: 70%;
+  margin: 10px auto;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+.caption a {
+  color: white;
+}
+
+/* target audience is capable classmates, so accessibility not a concern */
+:focus {
+  outline: none;
+}
+
+#background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.reveal, .reveal-children > * {
+  opacity: 0;
+}
+.revealed {
+  animation: reveal 1s forwards;
+}
+@keyframes reveal {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+.good-day {
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 50px;
+  margin-bottom: 0;
+}
+
+.full-name, .name {
+  font-size: 96px;
+  font-family: 'Audiowide', monospace;
+}
+.name-block {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 0;
+  font-family: 'Roboto', sans-serif;
+}
+.first-name {
+  color: #fdeb02;
+}
+.last-name {
+  color: #02ebfd;
+}
+.name {
+  display: block;
+}
+.ipa {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 34px;
+}
+.ipa::before, .ipa::after {
+  content: '/';
+  opacity: 0.5;
+}
+
+.etymology {
+  margin-bottom: 50px;
+}
+.arrow {
+  display: block;
+  margin: 16px auto;
+  width: 24px;
+  height: 24px;
+  background-image: url('./etym-arrow.svg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.language {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  display: block;
+}
+.word {
+  font-size: 20px;
+  display: block;
+}
+.chinese {
+  font-size: 48px;
+}
+.romanization {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  display: block;
+  font-style: italic;
+}
+.meaning {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+}
+.meaning::before, .meaning::after {
+  content: '"';
+}
+.source {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 10px;
+}
+.source a {
+  color: #fdeb02;
+}
+
+#definitions {
+  position: relative;
+  overflow: hidden;
+}
+.definition {
+  padding: 10px 40px;
+  display: none;
+  box-sizing: border-box;
+  width: 100%;
+  animation-timing-function: cubic-bezier(0, 0, 0.12, 0.99);
+}
+.def-by {
+  font-size: 16px;
+  font-weight: normal;
+}
+.def-1 {color: #fd6456;}
+.def-2 {color: #dafd02;}
+.def-3 {color: #02b1fd;}
+.def-4 {color: #bb6ffd;}
+.def-4 a {
+  color: #bb6ffd;
+}
+.showing {
+  display: block;
+  position: relative;
+}
+.leaving-left, .leaving-right {
+  display: block;
+  position: absolute;
+  top: 0;
+}
+.leaving-left {
+  animation: to-right .5s forwards;
+}
+.leaving-right {
+  animation: to-left .5s forwards;
+}
+.showing-left {
+  animation: to-left .5s reverse;
+}
+.showing-right {
+  animation: to-right .5s reverse;
+}
+@keyframes to-right {
+  from {
+    left: 0;
+  }
+  to {
+    left: 100%;
+  }
+}
+@keyframes to-left {
+  from {
+    right: 0;
+  }
+  to {
+    right: 100%;
+  }
+}
+.def-arrow {
+  -webkit-appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: absolute;
+  top: 50px;
+  background-position: 50% 50%;
+  background-size: 16px;
+  background-repeat: no-repeat;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  opacity: 0.5;
+  z-index: 1;
+  transition: background-position-x .2s;
+}
+.def-arrow:hover {
+  opacity: 0.8;
+}
+#left {
+  left: 0;
+  background-image: url('./arrow-left.svg');
+}
+#left:hover {
+  background-position-x: 30%;
+}
+#right {
+  right: 0;
+  background-image: url('./arrow-right.svg');
+}
+#right:hover {
+  background-position-x: 70%;
+}
+
+#website-ad {
+  text-align: right;
+  font-size: 16px;
+  margin-bottom: 27.5px;
+  margin-right: 70px;
+  margin-left: 20px;
+  position: fixed;
+  bottom: -100%;
+  right: 0;
+}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ShepForm Test</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A test page that should not concern you."/>
+    <link rel="stylesheet" href="shepform.css">
+    <link rel="stylesheet" href="colorinput.css">
+    <style>
+      body > input:first-of-type {
+        height: 30px;
+        width: 150px;
+        border-radius: 5px;
+        border: 5px solid rgba(0,0,0,0.3);
+      }
+      canvas {
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
+      code {color: #9e9e9e;}
+      .tag {color: #ce5050;}
+      .attr {color: #a98f32;}
+      .val {color: #4876c7;}
+      .fun {color: #526bb7;}
+    </style>
+  </head>
+  <body>
+    <shepselect>
+      <opt>donald trump</opt>
+      <opt>hillary clinton</opt>
+    </shepselect>
+    <p>ignore the above pls</p>
+    <p>btw the 'hi' you see down there is something that might be part of something someday</p>
+    <p>some filler text</p>
+    <!-- <p>more filler text</p> -->
+    <ul id='nonsenses'></ul>
+    <h1>Color input \ (&bull; u &bull;) /</h1>
+    <p>Add these into your page:</p>
+    <pre><code><span class='tag'>&lt;link</span> <span class='attr'>rel</span>="<span class='val'>stylesheet</span>" <span class='attr'>href</span>="<span class='val'>https://sheeptester.github.io/javascripts/shepform/colorinput.css</span>"<span class='tag'>&gt;</span></code></pre>
+    <pre><code><span class='tag'>&lt;script</span> <span class='attr'>src</span>='<span class='val'>https://sheeptester.github.io/javascripts/shepform/colorinput.js</span>'<span class='tag'>&gt;&lt;/script&gt;</span></code></pre>
+    <p>Then in some script tag put this:</p>
+    <pre><code><span class='fun'>isAColorInput(</span>INPUTELEMENT<span class='fun'>)</span>;</code></pre>
+    <input/><br>
+    Value: <strong></strong><br>
+    <input id='le2' value='#607D8B'/><br>
+    Value: <strong id='val2'></strong>
+    <ul id='nonsense'></ul>
+    <!-- <canvas width="100" height="100"></canvas> -->
+    <p>alpha will come one day hopefully</p>
+    <h1><a href="colour.html">BETTER COLOUR INPUT HERE</a></h1>
+
+    <script src="../../sheep.js"></script>
+    <script src='shepform.js'></script>
+    <script src='colorinput.js'></script>
+    <script>
+      shep.tell('Hi');
+      isAColorInput(document.querySelector('input'),{value:'hsl(187,71%,50%)'});
+      document.querySelector('input').onchange=function(){
+        document.querySelector('strong').innerHTML=document.querySelector('input').value;
+      };
+      isAColorInput(document.querySelector('#le2'));
+      document.querySelector('#le2').onchange=function(){
+        document.querySelector('#val2').innerHTML=document.querySelector('#le2').value;
+      };
+      function generateNonsense(ul,quantity) {
+        for (var i=0;i<quantity;i++) ul.appendChild(document.createElement('li'));
+      }
+      // generateNonsense(document.querySelector('#nonsense'),30)
+      // generateNonsense(document.querySelector('#nonsenses'),30)
+    </script>
+  </body>
+  <!-- MADE BY SEAN -->
+</html>

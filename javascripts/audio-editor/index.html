@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Audio Editor</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Sound editor built with stolen code from Scratch 3.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="../../sheep3.css">
+    <script src="../../sheep3.js" charset="utf-8"></script>
+    <script src="../_dom2.js" charset="utf-8"></script>
+    <script src="./select.js" charset="utf-8"></script>
+    <script src="./main.js" type="module" charset="utf-8"></script>
+    <style>
+      body {
+        background-color: #eee;
+        color: #666;
+        margin-bottom: 300px;
+      }
+      button {
+        -webkit-appearance: none;
+        border: none;
+        background: none;
+        font: inherit;
+        color: #333;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      button:hover:not(:disabled) {
+        text-decoration: underline;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: auto;
+      }
+      .sound-editor {
+        border-top: 1px solid rgba(0, 0, 0, 0.2);
+        margin-top: 15px;
+        padding-top: 15px;
+      }
+      .preview {
+        position: relative;
+        border: 1px solid #999;
+        max-width: 100%;
+        overflow-x: scroll;
+        font-size: 0;
+      }
+      .playhead {
+        position: absolute;
+        width: 1px;
+        height: 100%;
+        background-color: red;
+        left: 0;
+        top: 0;
+        display: none;
+      }
+      .selection-range {
+        position: absolute;
+        height: 100%;
+        background-color: rgba(0, 255, 255, 0.1);
+        top: 0;
+        left: 0;
+        right: 100%;
+      }
+      .selection-range::before, .selection-range::after {
+        display: flex;
+        position: absolute;
+        width: 1px;
+        height: 100%;
+        background-color: rgba(0, 0, 255, 0.5);
+        top: 0;
+        font-size: 12px;
+        color: rgba(255, 0, 0, 0.5);
+      }
+      .selection-range::before { left: -0.5px; content: attr(data-left-time); justify-content: flex-end; }
+      .selection-range::after { right: -0.5px; content: attr(data-right-time); align-items: flex-end; }
+      .waveform-wrapper {
+        display: inline-block;
+        position: relative;
+      }
+      .waveform {
+        -ms-interpolation-mode: bicubic;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        image-rendering: pixelated;
+      }
+      .select-wrapper {
+        position: relative;
+        display: inline;
+      }
+      .select-options-wrapper {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        display: none;
+        white-space: nowrap;
+        background-color: #ddd;
+        z-index: 1;
+      }
+      .select-options-wrapper.show {
+        display: block;
+      }
+      .select-separator {
+        margin: 5px 0;
+        display: block;
+        border-top: 1px solid #999;
+      }
+      .select-option {
+        display: block;
+      }
+      #record-sound,
+      #record-desktop {
+        color: #d74e4a;
+      }
+      #record-display {
+        width: 100px;
+        display: inline-block;
+        background-color: #999;
+      }
+      #record-display::before {
+        content: attr(data-time);
+        color: white;
+        font-family: monospace;
+        background-color: #d74e4a;
+        width: var(--level);
+        height: 100%;
+        display: block;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <p>MP3s require more time to encode but result in a smaller file size. Ctrl + scroll to zoom. Assembled by <a href="https://scratch.mit.edu/users/Sheep_maker/">Sheep_maker</a> on Scratch. <button id="open-desktop-audio">Try recording desktop audio</button> </p>
+    <p><label for="add-sound">Add sound: </label><input type="file" id="add-sound" accept=".mp3,.wav"> <button id="new-sound">Add empty sound</button> <a href="about.html">About</a></p>
+    <fieldset id="desktop-audio" class="hidden">
+      <legend>Record desktop audio</legend>
+      <p>Recording desktop audio is only supported on <a href="https://caniuse.com/#feat=mdn-api_mediadevices_getdisplaymedia_audio-capture-support">Windows or ChromeOS in Edge or Chrome</a>.</p>
+      <p>Clicking the below button will open a dialogue prompting you to share your screen. Make sure that you check "Share audio."</p>
+      <button id="record-desktop">record desktop audio</button>
+    </fieldset>
+    <p><button id="record-sound">record sound</button><button id="stop-record" disabled>stop recording</button><span id="record-display"></span></p>
+  </body>
+</html>

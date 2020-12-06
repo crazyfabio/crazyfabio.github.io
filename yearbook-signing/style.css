@@ -1,0 +1,187 @@
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background-image: url('./paper-background-smaller2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.sheep-drawing {
+  margin: 20px;
+}
+.cover {
+  background-color: black;
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  pointer-events: none;
+  transition: width 1s cubic-bezier(0.53, 0.1, 0.07, 0.96);
+}
+.loading .cover {
+  width: 100%;
+  transition: none;
+}
+
+.sheep {
+  --size: 400px;
+  --x: 0;
+  --y: 0;
+  --width: 1;
+  --height: 1;
+  background-image: url('./sheep-collage3.png');
+  background-position: calc(var(--size) * var(--x)) calc(var(--size) * var(--y));
+  background-size: var(--size) var(--size);
+  width: calc(var(--size) * var(--width));
+  height: calc(var(--size) * var(--height));
+}
+.sheep-standing {
+  --x: -0.010;
+  --y: -0.005;
+  --width: 0.215;
+  --height: 0.205;
+}
+.sheep-cake {
+  --x: -0.225;
+  --y: -0.000;
+  --width: 0.315;
+  --height: 0.240;
+}
+.sheep-eat1 {
+  --x: -0.545;
+  --y: -0.000;
+  --width: 0.350;
+  --height: 0.180;
+}
+.sheep-fancy {
+  --x: -0.000;
+  --y: -0.245;
+  --width: 0.240;
+  --height: 0.225;
+}
+.sheep-hyperbola {
+  --x: -0.245;
+  --y: -0.245;
+  --width: 0.510;
+  --height: 0.270;
+}
+.sheep-right {
+  --x: -0.005;
+  --y: -0.505;
+  --width: 0.290;
+  --height: 0.180;
+}
+.sheep-left {
+  --x: -0.300;
+  --y: -0.515;
+  --width: 0.280;
+  --height: 0.200;
+}
+.sheep-eat2 {
+  --x: -0.580;
+  --y: -0.510;
+  --width: 0.420;
+  --height: 0.225;
+}
+.sheep-hybridized {
+  --x: -0.600;
+  --y: -0.750;
+  --width: 0.400;
+  --height: 0.245;
+}
+.sheep-box-and-pointer {
+  --x: -0.000;
+  --y: -0.720;
+  --width: 0.510;
+  --height: 0.280;
+}
+
+.numbers {
+  display: inline-block;
+  --size: 100px;
+  --xsize: calc(var(--size) * calc(1631 / 438));
+  --x: 0;
+  --y: 0;
+  --width: calc(1631 / 438);
+  --height: 0.28;
+  background-image: url('./numbers-4.png');
+  background-position: calc(var(--size) * var(--x)) calc(var(--size) * var(--y));
+  background-size: var(--xsize) var(--size);
+  width: calc(var(--size) * var(--width));
+  height: calc(var(--size) * var(--height));
+}
+.number-0 {
+  --x: -0.04;
+  --y: -0.35;
+  --width: 0.30;
+}
+.number-1 {
+  --x: -0.43;
+  --y: -0.35;
+  --width: 0.09;
+}
+.number-2 {
+  --x: -0.60;
+  --y: -0.35;
+  --width: 0.20;
+}
+.number-3 {
+  --x: -0.91;
+  --y: -0.02;
+  --width: 0.20;
+}
+.number-4 {
+  --x: -1.20;
+  --y: -0.02;
+  --width: 0.21;
+}
+.number-5 {
+  --x: -1.56;
+  --y: -0.02;
+  --width: 0.30;
+}
+.number-6 {
+  --x: -1.89;
+  --y: -0.02;
+  --width: 0.22;
+}
+.number-7 {
+  --x: -2.21;
+  --y: -0.02;
+  --width: 0.21;
+}
+.number-8 {
+  --x: -2.50;
+  --y: -0.00;
+  --width: 0.22;
+}
+.number-9 {
+  --x: -2.85;
+  --y: -0.02;
+  --width: 0.19;
+}
+.number-hash {
+  --x: -3.15;
+  --y: -0.64;
+  --width: 0.36;
+}
+.number-unknown {
+  --x: -3.11;
+  --y: -0.32;
+  --width: 0.55;
+}

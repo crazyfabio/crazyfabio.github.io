@@ -1,0 +1,27 @@
+{
+  "scripts": {
+    "all": "node ./all/get-all.js && node ./all/gen.js",
+    "compress": "node ./img/compress.js"
+  },
+  "dependencies": {
+    "discord.js": "^12.3.1",
+    "node-fetch": "^2.6.1",
+    "pngquant-bin": "^5.0.2",
+    "xml2js": "^0.4.23"
+  },
+  "name": "sheeptester.github.io",
+  "description": "GitHub pages",
+  "version": "1.0.0",
+  "main": "main.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SheepTester/sheeptester.github.io.git"
+  },
+  "author": "SheepTester",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SheepTester/sheeptester.github.io/issues"
+  },
+  "homepage": "https://github.com/SheepTester/sheeptester.github.io#readme"
+}

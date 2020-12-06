@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Unicode characters</title>
+    <meta
+      name="description"
+      content="Unicode is divided into planes of 65536 characters, which are further divided into blocks."
+    />
+
+    <link rel="stylesheet" type="text/css" href="/sheep3.css" />
+    <script src="/sheep3.js" charset="utf-8"></script>
+
+    <script src="./_dom2.js" charset="utf-8"></script>
+    <script src="./clipboard.min.js" charset="utf-8"></script>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column-reverse;
+        margin: 0;
+        overflow: hidden;
+        background-color: #19171b;
+        color: #dddcde;
+        /* Font list stolen from https://paly.win/ */
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+          'Segoe UI Symbol';
+      }
+      button,
+      input,
+      select,
+      textarea {
+        -webkit-appearance: none;
+        border: none;
+        background: none;
+        font: inherit;
+        color: inherit;
+      }
+      button:not(:disabled),
+      select:not(:disabled) {
+        cursor: pointer;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        height: 48px;
+        padding: 0 5px;
+        background-color: #0d0b0e;
+      }
+      .planes {
+        background-color: #0d0b0e;
+        background-image: url('./material-arrow_drop_up.svg');
+        background-size: 24px;
+        background-repeat: no-repeat;
+        background-position: right;
+        padding: 10px;
+      }
+      .showing-box .planes {
+        display: none;
+      }
+      .back-btn {
+        display: none;
+        font-size: 0;
+        background-image: url('./material-arrow_back.svg');
+        background-size: 24px;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 24px;
+        height: 24px;
+        padding: 10px;
+        box-sizing: content-box;
+      }
+      .showing-box .back-btn {
+        display: block;
+      }
+
+      .wrapper {
+        flex: auto;
+        position: relative;
+        /* Fixes resizing issues in mobile, but won't be able to show the hex
+        /* headers? */
+        overflow: hidden;
+      }
+      .grid-16 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        touch-action: none;
+        margin: 0;
+        border: none;
+        padding: 0;
+      }
+      .grid-16:disabled {
+        pointer-events: none;
+      }
+      .hidden {
+        display: none;
+      }
+      .fade {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .animating {
+        transition: transform 0.5s, opacity 0.5s;
+      }
+      .grid-item {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 40px;
+        height: 40px;
+        box-sizing: border-box;
+        padding: 2px;
+        display: flex;
+        transform: translateZ(0);
+      }
+      .zooming-in .grid-item:not(.target) {
+        visibility: hidden;
+        /* animation: hide-early .5s forwards; */
+      }
+      .grid-btn {
+        flex: auto;
+        max-width: 100%;
+        background-color: #312f35;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 2px;
+        position: relative;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .grid-item:hover {
+        z-index: 1;
+      }
+      .grid-item:hover .grid-btn {
+        transform: scale(1.5);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      }
+      .character {
+        outline: 1px dashed rgba(0, 255, 255, 0.1);
+      }
+      .hex-col {
+        justify-content: center;
+        align-items: center;
+      }
+      .hex-row {
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 0.8em;
+        padding-right: 5px;
+      }
+      .prefix {
+        opacity: 0.3;
+      }
+      .suffix {
+        opacity: 0.5;
+      }
+      @keyframes hide-early {
+        0% {
+          opacity: 1;
+          visibility: visible;
+        }
+        5% {
+          opacity: 0;
+          visibility: visible;
+        }
+        5.1% {
+          opacity: 0;
+          visibility: hidden;
+        }
+        100% {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <button class="back-btn" id="back">Back</button>
+      <select class="planes" id="planes"></select>
+    </div>
+    <div class="wrapper" id="wrapper"></div>
+    <script>
+      // Links
+      // Blocks: https://en.wikipedia.org/wiki/Unicode_block
+      // Planes: https://en.wikipedia.org/wiki/Plane_(Unicode)
+
+      const data = {
+        // https://en.wikipedia.org/wiki/Plane_(Unicode)#Overview
+        planes: {
+          0: {
+            name: 'Basic Multilingual Plane',
+            initialism: 'BMP'
+          },
+          1: {
+            name: 'Supplementary Multilingual Plane',
+            initialism: 'SMP'
+          },
+          2: {
+            name: 'Supplementary Ideographic Plane',
+            initialism: 'SIP'
+          },
+          3: {
+            name: 'Tertiary Ideographic Plane',
+            initialism: 'TIP'
+          },
+          14: {
+            name: 'Supplement­ary Special-purpose Plane',
+            initialism: 'SSP'
+          },
+          15: {
+            name: 'Supplement­ary Private Use Area-A',
+            initialism: 'SPUA-A'
+          },
+          16: {
+            name: 'Supplement­ary Private Use Area-B',
+            initialism: 'SPUA-B'
+          }
+        }
+      }
+
+      function delay (time) {
+        return new Promise(resolve => setTimeout(resolve, time))
+      }
+
+      function frame () {
+        return new Promise(resolve => window.requestAnimationFrame(resolve))
+      }
+
+      const size = 16 // cells
+      const gridSize = 40 // px
+      const maxSize = 1000 // px
+      const padding = 1 // cells
+
+      const normalSize = gridSize * size
+      const paddingPx = gridSize * padding
+      const normalTotalSize = normalSize + 2 * paddingPx
+      const maxScale = maxSize / normalTotalSize
+
+      class Grid16 {
+        constructor () {
+          this.wrapper = Elem(
+            'fieldset',
+            {
+              className: 'grid-16 hidden',
+              onclick: this._onClick.bind(this)
+            },
+            Array.from({ length: size * size }, (_, i) => {
+              const x = i % size
+              const y = Math.floor(i / size)
+              return Elem('div', {
+                className: 'grid-item',
+                data: { index: i, x, y },
+                style: {
+                  // Set translateZ to 0 so it renders on a new layer
+                  // https://stackoverflow.com/a/54294386
+                  transform: `translate3d(${x * gridSize}px, ${y *
+                    gridSize}px, 0)`
+                }
+              })
+            })
+          )
+          this.mode = 'full'
+          this.baseTransform = []
+        }
+
+        _onClick (e) {
+          const item = e.target.closest('.grid-item')
+          if (item && item.dataset.index) {
+            this.onClick(+item.dataset.index)
+          }
+        }
+
+        onClick (index) {
+          console.log(index)
+        }
+
+        containIn (x, y) {
+          this.mode = 'contained'
+          this.wrapper.style.setProperty('--contained-x', x * gridSize + 'px')
+          this.wrapper.style.setProperty('--contained-y', y * gridSize + 'px')
+          this.wrapper.style.transform = [
+            ...this.baseTransform,
+            'translate(var(--contained-x), var(--contained-y))',
+            `scale(${1 / size})`
+          ].join(' ')
+          return this
+        }
+
+        fullSize () {
+          this.mode = 'full'
+          this.wrapper.style.transform = this.baseTransform.join(' ')
+          return this
+        }
+
+        fromCell (x, y) {
+          this.mode = 'cell'
+          this.wrapper.style.setProperty('--as-cell-x', -x * gridSize + 'px')
+          this.wrapper.style.setProperty('--as-cell-y', -y * gridSize + 'px')
+          this.wrapper.style.transform = [
+            ...this.baseTransform,
+            `scale(${size})`,
+            'translate(var(--as-cell-x), var(--as-cell-y))'
+          ].join(' ')
+          return this
+        }
+
+        resize (width, height) {
+          let scale
+          if (width > height) {
+            scale = height / normalTotalSize
+          } else {
+            scale = width / normalTotalSize
+          }
+          if (scale > maxScale) {
+            scale = maxScale
+          }
+          const translateX = (width - normalSize * scale) / 2
+          const translateY = (height - normalSize * scale) / 2
+          this.baseTransform = [
+            `translate(${translateX}px, ${translateY}px)`,
+            `scale(${scale})`
+          ]
+          switch (this.mode) {
+            case 'contained':
+              this.wrapper.style.transform = [
+                ...this.baseTransform,
+                'translate(var(--contained-x), var(--contained-y))',
+                `scale(${1 / size})`
+              ].join(' ')
+              break
+            case 'cell':
+              this.wrapper.style.transform = [
+                ...this.baseTransform,
+                `scale(${size})`,
+                'translate(var(--as-cell-x), var(--as-cell-y))'
+              ].join(' ')
+              break
+            default:
+              this.fullSize()
+          }
+          return this
+        }
+
+        show () {
+          this.wrapper.classList.remove('hidden')
+          return this
+        }
+
+        hide () {
+          this.wrapper.classList.add('hidden')
+          return this
+        }
+
+        fade () {
+          this.wrapper.disabled = true
+          this.wrapper.classList.add('fade')
+          return this
+        }
+
+        unfade () {
+          this.wrapper.disabled = false
+          this.wrapper.classList.remove('fade')
+          return this
+        }
+
+        _animate () {
+          this.wrapper.classList.add('animating')
+          this.wrapper.getBoundingClientRect() // Force repaint
+          return this
+        }
+
+        _zoomingIn () {
+          this.wrapper.classList.add('zooming-in')
+          return this
+        }
+
+        _animateStop () {
+          this.wrapper.classList.remove('animating')
+          this.wrapper.classList.remove('zooming-in')
+          return this
+        }
+
+        // contained -> full (show)
+        async zoomFromContained (x, y) {
+          this.fade()
+            .containIn(x, y)
+            .show()
+            ._animate()
+            .unfade()
+            .fullSize()
+          await delay(500)
+          return this._animateStop()
+        }
+
+        // full -> contained (hide)
+        async zoomToContained (x, y) {
+          this.unfade()
+            .fullSize()
+            .show()
+            ._animate()
+            .fade()
+            .containIn(x, y)
+          await delay(500)
+          return this.hide()._animateStop()
+        }
+
+        // cell -> full (show)
+        async zoomFromCell (x, y) {
+          this.wrapper.children[x + y * size].classList.add('target')
+          this.fade()
+            .fromCell(x, y)
+            .show()
+            ._zoomingIn()
+            ._animate()
+            .unfade()
+            .fullSize()
+          await delay(500)
+          this.wrapper.children[x + y * size].classList.remove('target')
+          return this._animateStop()
+        }
+
+        // full -> cell (hide)
+        async zoomToCell (x, y) {
+          this.wrapper.children[x + y * size].classList.add('target')
+          this.unfade()
+            .fullSize()
+            .show()
+            ._zoomingIn()
+            ._animate()
+            .fade()
+            .fromCell(x, y)
+          await delay(500)
+          this.wrapper.children[x + y * size].classList.remove('target')
+          return this.hide()._animateStop()
+        }
+      }
+
+      class Plane extends Grid16 {
+        constructor (box) {
+          super()
+          this.box = box
+          this.showingBox = false
+          for (const child of this.wrapper.children) {
+            child.append(
+              Elem('button', { className: 'grid-btn' }, [
+                (+child.dataset.index)
+                  .toString(16)
+                  .toUpperCase()
+                  .padStart(2, '0')
+              ])
+            )
+          }
+        }
+
+        setPlane (plane) {
+          this.plane = plane
+          return this
+        }
+
+        onClick (index) {
+          this.showingBox = true
+          document.body.classList.add('showing-box')
+          this.box.setLocation((this.plane << 8) | index)
+          const { x, y } = this.wrapper.children[index].dataset
+          this.box.zoomFromContained(+x, +y)
+          this.zoomToCell(+x, +y)
+          url.searchParams.set(
+            'char',
+            this.box.location.toString(16).padStart(2, '0') + 'xx'
+          )
+          window.history.pushState({}, '', url)
+        }
+
+        closeBox () {
+          this.showingBox = false
+          document.body.classList.remove('showing-box')
+          const { x, y } = this.wrapper.children[
+            this.box.location & 0xff
+          ].dataset
+          this.box.zoomToContained(+x, +y)
+          this.zoomFromCell(+x, +y)
+          if (this.plane) {
+            url.searchParams.set('char', this.plane.toString(16) + 'xxxx')
+          } else {
+            url.searchParams.delete('char')
+          }
+          window.history.pushState({}, '', url)
+        }
+      }
+
+      class Box extends Grid16 {
+        constructor () {
+          super()
+          this.characters = new Array(size * size)
+          this.rowLabels = new Array(size)
+          for (const child of this.wrapper.children) {
+            const index = +child.dataset.index
+            this.characters[index] = Elem('span', {
+              className: 'character'
+            })
+            child.append(
+              Elem('button', { className: 'grid-btn copy-text' }, [
+                this.characters[index]
+              ])
+            )
+          }
+          for (let i = 0; i < size; i++) {
+            const columnLabel = Elem(
+              'div',
+              {
+                className: 'grid-item hex-col',
+                style: {
+                  transform: `translate3d(${i * gridSize}px, ${-gridSize}px, 0)`
+                }
+              },
+              [i.toString(16).toUpperCase()]
+            )
+            const rowLabelText = document.createTextNode('')
+            const rowLabel = Elem(
+              'div',
+              {
+                className: 'grid-item hex-row',
+                style: {
+                  transform: `translate3d(${-gridSize}px, ${i * gridSize}px, 0)`
+                }
+              },
+              [
+                Elem('span', {}, [
+                  Elem('span', { className: 'prefix' }, ['U+']),
+                  rowLabelText,
+                  Elem('span', { className: 'suffix' }, ['x'])
+                ])
+              ]
+            )
+            this.rowLabels[i] = rowLabelText
+            this.wrapper.append(columnLabel, rowLabel)
+          }
+        }
+
+        setLocation (location) {
+          this.location = location
+          location <<= 4
+          this.rowLabels.forEach((rowLabel, index) => {
+            rowLabel.nodeValue = (location | index)
+              .toString(16)
+              .toUpperCase()
+              .padStart(3, '0')
+          })
+          location <<= 4
+          this.characters.forEach((span, index) => {
+            const char = String.fromCodePoint(location | index)
+            span.parentNode.dataset.clipboardText = char
+            span.textContent = char
+          })
+          return this
+        }
+      }
+
+      let url = new URL(window.location)
+      window.addEventListener('popstate', e => {
+        url = new URL(window.location)
+        setStateFromURL()
+      })
+      function setStateFromURL () {
+        let charLoc = url.searchParams.get('char') || 'xxxx'
+        const chars = [...charLoc]
+        if (chars.length === 1) {
+          charLoc = chars[0]
+            .codePointAt()
+            .toString(16)
+            .toUpperCase()
+            .padStart(4, '0')
+        }
+        if (charLoc.slice(-2) === 'xx') {
+          const boxLoc = charLoc.slice(0, -2)
+          if (plane.showingBox) {
+            plane.closeBox()
+          }
+          let planeIndex,
+            boxIndex = null
+          if (boxLoc.slice(-2) === 'xx') {
+            planeIndex = parseInt(boxLoc.slice(0, -2) || 0, 16)
+          } else {
+            const boxLocNum = parseInt(boxLoc, 16)
+            boxIndex = boxLocNum & 0xff
+            planeIndex = boxLocNum >> 8
+          }
+          planes.value = planeIndex
+          plane.setPlane(planeIndex)
+          if (boxIndex !== null) {
+            plane.onClick(boxIndex)
+          }
+        } else {
+          // TEMP: Showing a character currently isn't supported
+          url.searchParams.set('char', charLoc.slice(0, -2) + 'xx')
+          window.history.replaceState({}, '', url)
+          setStateFromURL()
+        }
+      }
+
+      const clipboard = new ClipboardJS('.copy-text')
+      clipboard.on('error', console.error)
+
+      const wrapper = document.getElementById('wrapper')
+      const box = new Box()
+      const plane = new Plane(box).setPlane(0).show()
+      // .setLocation(0x1f3)
+      // box.setLocation(0xFD)
+      wrapper.append(plane.wrapper, box.wrapper)
+
+      const planes = document.getElementById('planes')
+      planes.append(
+        ...Array.from({ length: 17 }, (_, plane) => {
+          const { name = 'unassigned' } = data.planes[plane] || {}
+          return Elem(
+            'option',
+            {
+              value: plane
+            },
+            [`${plane} ${name}`]
+          )
+        })
+      )
+      planes.addEventListener('change', e => {
+        plane.setPlane(+planes.value)
+        if (plane.showingBox) {
+          url.searchParams.set(
+            'char',
+            box.location.toString(16).padStart(2, '0') + 'xx'
+          )
+        } else {
+          if (plane.plane) {
+            url.searchParams.set('char', plane.plane.toString(16) + 'xxxx')
+          } else {
+            url.searchParams.delete('char')
+          }
+        }
+        window.history.pushState({}, '', url)
+      })
+
+      document.getElementById('back').addEventListener('click', e => {
+        plane.closeBox()
+      })
+
+      function resize () {
+        const { width, height } = wrapper.getBoundingClientRect()
+        plane.resize(width, height)
+        box.resize(width, height)
+      }
+      window.addEventListener('resize', resize)
+      resize()
+
+      setStateFromURL()
+    </script>
+  </body>
+</html>
