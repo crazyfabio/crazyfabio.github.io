@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
     document.body.classList.add('sheep-blockscreen');
     homeButton.addEventListener('transitionend', function(e) {
       setTimeout(function() {
-        window.location = './ezhub.html';
+        window.location = '/ezhub.html';
       }, 100);
     });
   });
