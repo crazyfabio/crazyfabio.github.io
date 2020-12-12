@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Discord webhook sender</title>
-    <meta name="description" content="A WYSIWYG editor for Discord webhooks"/>
+    <title>Discord WebHooks</title>
+    <meta name="description" content="Editor webhooks per discord"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/monolith.min.css"/>
@@ -444,7 +444,7 @@ class ImageInput {
         backgroundImage: url ? `url("${encodeURI(url)}")` : null
       },
       onclick: e => {
-        const url = prompt('Image URL (leave blank to clear image):', this.url)
+        const url = prompt('URL Immagine (Lascia vuoto per rimuovere):', this.url)
         if (url !== null) {
           if (url) {
             this.elem.style.backgroundImage = `url("${encodeURI(url)}")`
@@ -535,7 +535,7 @@ class LinkInput {
       title: label,
       href: url || '#',
       onclick: e => {
-        const url = prompt('URL (leave blank to remove link):', this.url)
+        const url = prompt('URL (Lascia vuoto per rimuovere):', this.url)
         if (url !== null) {
           if (url) {
             this.elem.href = url
@@ -559,8 +559,8 @@ class LinkInput {
 
 class Field {
   constructor({name, value, inline = true} = {}, removeFn) {
-    this._name = new TextInput({className: 'embed-field-name', value: name, placeholder: 'Field name'})
-    this._value = new TextInput({className: 'embed-field-value', value, placeholder: 'Field value'})
+    this._name = new TextInput({className: 'embed-field-name', value: name, placeholder: 'Nome del campo'})
+    this._value = new TextInput({className: 'embed-field-value', value, placeholder: 'Valore del campo'})
     this._inline = inline
 
     this.elem = Elem('div', {className: ['embed-field', inline && 'embed-field-inline']}, [
@@ -568,7 +568,7 @@ class Field {
       this._value.elem,
       Elem('button', {
         className: 'field-remove',
-        title: 'Remove field',
+        title: 'Rimuovi campo',
         innerHTML: '&times;',
         onclick: e => {
           removeFn(this)
@@ -576,7 +576,7 @@ class Field {
       }),
       Elem('button', {
         className: 'field-inline',
-        title: 'Toggle inline field',
+        title: 'Attiva campo in linea',
         onclick: e => {
           this._inline = !this._inline
           this.elem.classList.toggle('embed-field-inline')
@@ -613,18 +613,18 @@ class Embed {
   } = {}, removeFn = null) {
     this.removeField = this.removeField.bind(this)
 
-    this._authorImage = new ImageInput({className: 'embed-author-icon', url: authorImage, label: 'Set author icon URL'})
-    this._author = new TextInput({className: 'embed-author-name', value: author, placeholder: 'Author name'})
-    this._authorLink = new LinkInput({className: 'embed-author-link', url: authorLink, label: 'Set author URL'})
+    this._authorImage = new ImageInput({className: 'embed-author-icon', url: authorImage, label: 'URL Icona Autore'})
+    this._author = new TextInput({className: 'embed-author-name', value: author, placeholder: 'Nome Autore'})
+    this._authorLink = new LinkInput({className: 'embed-author-link', url: authorLink, label: 'URL Autore'})
 
-    this._title = new TextInput({className: 'embed-title', value: title, placeholder: 'Embed title'})
-    this._link = new LinkInput({className: 'embed-link', url: link, label: 'Set embed URL'})
-    this._description = new TextInput({className: 'embed-description', value: description, placeholder: 'Embed discription (supports markdown and inline links)'})
-    this._thumbnail = new ImageInput({className: 'embed-thumbnail', url: thumbnail, label: 'Set thumbnail image URL'})
-    this._image = new ImageInput({className: 'embed-image', url: image, label: 'Set image URL'})
+    this._title = new TextInput({className: 'embed-title', value: title, placeholder: 'Titolo Embed'})
+    this._link = new LinkInput({className: 'embed-link', url: link, label: 'URL Embed'})
+    this._description = new TextInput({className: 'embed-description', value: description, placeholder: 'Descrizione Embed'})
+    this._thumbnail = new ImageInput({className: 'embed-thumbnail', url: thumbnail, label: 'URL Thumbnail'})
+    this._image = new ImageInput({className: 'embed-image', url: image, label: 'URL Immagine'})
 
-    this._footerImage = new ImageInput({className: 'embed-footer-icon', url: footerImage, label: 'Set footer icon URL'})
-    this._footer = new TextInput({className: 'embed-footer-text', value: footer, placeholder: 'Footer text', multiline: false})
+    this._footerImage = new ImageInput({className: 'embed-footer-icon', url: footerImage, label: 'URL Icona Footer'})
+    this._footer = new TextInput({className: 'embed-footer-text', value: footer, placeholder: 'Testo Footer', multiline: false})
 
     this._fields = fields.map(field => new Field(field, this.removeField))
     this._addFieldBtn = Elem('button', {
@@ -635,9 +635,9 @@ class Embed {
         this._addFieldBtn.parentElement.insertBefore(field.elem, this._addFieldBtn)
         if (window.onChange) window.onChange()
       }
-    }, ['Add field'])
+    }, ['Aggiungi Campo'])
 
-    const timeStampTrigger = Elem('button', {title: 'Set timestamp'})
+    const timeStampTrigger = Elem('button', {title: 'Imposta Orario'})
     this._timestamp = flatpickr(
       timeStampTrigger,
       {
@@ -651,13 +651,13 @@ class Embed {
     if (timestamp) {
       this._timestamp.setDate(timestamp, true)
     } else {
-      timeStampTrigger.textContent = 'Unset'
+      timeStampTrigger.textContent = 'Non impostato'
     }
 
     const initColourStr = colour ? '#' + colour.toString(16).padStart(6, '0') : null
     const colourTrigger = Elem('button', {
       className: 'embed-pill',
-      title: 'Set colour',
+      title: 'Imposta colore',
       style: {
         backgroundColor: initColourStr
       }
@@ -693,7 +693,7 @@ class Embed {
     this.elem = Elem('div', {className: 'embed'}, [
       Elem('button', {
         className: 'close',
-        title: 'Remove embed',
+        title: 'Rimuovi embed',
         innerHTML: `<svg width="16" height="16" viewBox="0 0 12 12"><path class="fill" fill="currentColor" d="M9.5 3.205L8.795 2.5 6 5.295 3.205 2.5l-.705.705L5.295 6 2.5 8.795l.705.705L6 6.705 8.795 9.5l.705-.705L6.705 6"></path></svg>`,
         onclick: e => {
           if (removeFn) {
@@ -731,7 +731,7 @@ class Embed {
             timeStampTrigger,
             ' ',
             Elem('button', {
-              title: 'Clear timestamp',
+              title: 'Rimuovi Orario',
               innerHTML: '&times;',
               onclick: e => {
                 this._timestamp.clear()
@@ -829,9 +829,9 @@ const {
   embeds: embedsArray = []
 } = json
 
-const avatar = new ImageInput({className: 'avatar image', url: avatar_url, label: 'Set avatar URL'})
+const avatar = new ImageInput({className: 'avatar image', url: avatar_url, label: 'URL Avatar'})
 const username = new TextInput({className: 'username', value: usernameText, placeholder: 'Username', multiline: false})
-const message = new TextInput({className: 'markup', value: content, placeholder: 'Message content (supports markdown; 2000 character maximum)'})
+const message = new TextInput({className: 'markup', value: content, placeholder: 'Contenuto messaggio (supporta markdown; massimo 2000 caratteri)'})
 
 function removeEmbed (embed) {
   const index = embeds.indexOf(embed)
@@ -851,7 +851,7 @@ const addEmbedBtn = Elem('button', {
     addEmbedBtn.parentElement.insertBefore(embed.elem, addEmbedBtn)
     if (window.onChange) window.onChange()
   }
-}, ['Add embed'])
+}, ['Aggiungi embed'])
 
 document.body.appendChild(
   Elem('div', {className: 'message'}, [
@@ -860,7 +860,7 @@ document.body.appendChild(
       Elem('div', {}, [
         username.elem,
         Elem('span', {className: 'bot'}, ['BOT']),
-        Elem('span', {className: 'timestamp'}, ['Today at 15:60'])
+        Elem('span', {className: 'timestamp'}, ['Oggi alle 13:00'])
       ])
     ]),
     Elem('div', {className: 'content'}, [
@@ -885,7 +885,7 @@ function getJSON () {
 
 const permalink = Elem('a', {
   className: 'permalink',
-  title: 'Get permalink',
+  title: 'Permalink',
   href: ''
 })
 window.onChange = () => {
@@ -893,7 +893,7 @@ window.onChange = () => {
   params.set('json', JSON.stringify(getJSON()))
   permalink.href = '?' + params
 }
-const status = Elem('div', {className: 'markup status hidden'})
+const status = Elem('div', {className: 'markup nascosti'})
 let hideStatusTimeout
 function displayStatus () {
   if (hideStatusTimeout) clearTimeout(hideStatusTimeout)
@@ -927,7 +927,7 @@ document.body.appendChild(
         className: 'textarea',
         type: 'url',
         value: params.get('webhook'),
-        placeholder: 'Paste Discord webhook URL here (press enter to send)',
+        placeholder: 'Incolla L"URL Del WebHook qui (premi invio per inviarlo)',
         onkeydown (e) {
           if (e.key === 'Enter') {
             // Send to multiple webhook URLs at once by separating them with
