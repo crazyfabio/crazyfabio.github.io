@@ -935,7 +935,7 @@ document.body.appendChild(
             sendToWebhooks(this.value.split(/\s+/), JSON.stringify(getJSON()))
               .catch(err => {
                 console.error(err)
-                status.textContent = 'Problem executing webhook'
+                status.textContent = 'Errore'
                 status.classList.add('failed')
                 displayStatus()
               })
